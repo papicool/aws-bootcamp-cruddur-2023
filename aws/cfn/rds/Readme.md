@@ -1,5 +1,5 @@
-export DB_PASSWORD=<db_password>
-gp env DB_PASSWORD=<db_password>
+export DB_PASSWORD=Philosophie10
+gp env DB_PASSWORD=Philosophie10
 
 get the new db endpoint
 Go to System Manager and update the parameter store named connection URL 
