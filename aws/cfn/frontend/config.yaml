@@ -1,0 +1,9 @@
+[deploy]
+bucket = 'cfn-artifacts-cloudbootcamp'
+region = 'us-east-1'
+stack_name = 'CrdFrontend'
+
+[parameters]
+CertificateArn = 'arn:aws:acm:us-east-1:730331264766:certificate/96d8b700-65f2-4852-bbfe-09d35d30519f'
+WwwBucketName = 'www.cruddursn.net'
+RootBucketName = 'cruddursn.net'
