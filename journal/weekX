@@ -18,3 +18,156 @@ gem install aws_s3_website_sync
 generate env vars : ./bin/fronend/generate-env
 
 run the script ./bin/frontend/sync
+
+## Github Action after a commit to synchronize it with S3 website host
+
+create directory .github/workflows/sync.yaml
+
+
+create Gemfile and Rakefile in the root directory of the projet
+
+Gemfile
+
+```sh
+source 'https://rubygems.org'
+
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
+end
+
+gem 'rake'
+gem 'aws_s3_website_sync', tag: '1.0.1'
+gem 'dotenv', groups: [:development, :test]
+```
+
+
+Rakefile
+```sh
+require 'aws_s3_website_sync'
+require 'dotenv'
+
+task :sync do
+  puts "sync =="
+  AwsS3WebsiteSync::Runner.run(
+    aws_access_key_id:     ENV["AWS_ACCESS_KEY_ID"],
+    aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+    aws_default_region:    ENV["AWS_DEFAULT_REGION"],
+    s3_bucket:             ENV["S3_BUCKET"],
+    distribution_id:       ENV["SYNC_CLOUDFRONT_DISTRIBUTION_ID"],
+    build_dir:             ENV["BUILD_DIR"],
+    output_changset_path:  ENV["OUTPUT_CHANGESET_PATH"],
+    auto_approve:          ENV["AUTO_APPROVE"],
+    silent: "ignore,no_change",
+    ignore_files: [
+      'stylesheets/index',
+      'android-chrome-192x192.png',
+      'android-chrome-256x256.png',
+      'apple-touch-icon-precomposed.png',
+      'apple-touch-icon.png',
+      'site.webmanifest',
+      'error.html',
+      'favicon-16x16.png',
+      'favicon-32x32.png',
+      'favicon.ico',
+      'robots.txt',
+      'safari-pinned-tab.svg'
+    ]
+  )
+end
+```
+
+create cfn repository named sync
+
+template.yaml
+
+```sh
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  GitHubOrg:
+    Description: Name of GitHub organization/user (case sensitive)
+    Type: String
+  RepositoryName:
+    Description: Name of GitHub repository (case sensitive)
+    Type: String
+    Default: "aws-bootcamp-cruddur-2023"
+  OIDCProviderArn:
+    Description: Arn for the GitHub OIDC Provider.
+    Default: ""
+    Type: String
+  OIDCAudience:
+    Description: Audience supplied to configure-aws-credentials.
+    Default: "sts.amazonaws.com"
+    Type: String
+
+Conditions:
+  CreateOIDCProvider: !Equals
+    - !Ref OIDCProviderArn
+    - ""
+
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: !Ref OIDCAudience
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+
+Outputs:
+  Role:
+    Value: !GetAtt Role.Arn
+
+```
+
+config.toml
+
+```sh
+[deploy]
+bucket = 'cfn-artifacts-cloudbootcamp'
+region = 'us-east-1'
+stack_name = 'CrdSyncRole'
+
+[parameters]
+GitHubOrg = 'papicool'
+RepositoryName = 'aws-bootcamp-cruddur-2023'
+OIDCProviderArn = ''
+
+
+```
+
+test cfn
+
+```sh
+chmod u+x ./bin/cfn/sync
+./bin/cfn/sync
+```
+
+create a policy S3AccessforSyncing in the CrdSyncRole to S3 cruddursn.net to any objet
+getObject
+PutObject
+listBucket
+deleteObject
+
+
+grab the CrdSyncRole Arn and paste it to .github/workflows/sync.yaml
