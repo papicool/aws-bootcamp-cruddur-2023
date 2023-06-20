@@ -1,2 +1,20 @@
+## Sync tool for static website hosting
+
 run 
 ./bin/frontend/static-build
+
+
+Zip the build files
+cd frontend
+zip -r build.zip build/
+
+Bring the zip file to S3  (drag in drop the content to cruddursn.net bucket)
+
+create a file called bin/frontend/sync
+
+gem install aws_s3_website_sync
+
+
+generate env vars : ./bin/fronend/generate-env
+
+run the script ./bin/frontend/sync
