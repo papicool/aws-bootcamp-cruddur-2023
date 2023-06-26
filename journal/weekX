@@ -238,3 +238,20 @@ We have to change in this case the value of the parameter CONNECTION_URL
 swith the Lambda VPC to the cfn vpc created
 
 create a new SG named CognitoLambdaSG
+
+
+## Week X Use CORS for Service
+
+add these following lines on the cfn config toml of the service:
+
+pls adapt it!!!
+
+```sh
+[parameters]
+EnvFrontendUrl = 'https://cruddursn.net'
+EnvBackendUrl = 'https://api.cruddursn.net'
+
+
+```
+deploy the service
+./bin/cfn/service
