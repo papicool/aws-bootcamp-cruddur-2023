@@ -25,18 +25,18 @@ def lambda_handler(event, context):
             cognito_user_id
             ) 
         VALUES(
-            %s,
-            %s,
-            %s,
-            %s
+            %(display_name)s,
+            %(email)s,
+            %(handle)s,
+            %(cognito_user_id)s
             )
         """
         #cur.execute("INSERT INTO users (display_name, handle, cognito_user_id) VALUES(%s, %s, %s)", (user['name'], user['email'], user['sub']))
         params = [
-            user_display_name,
-            user_email,
-            user_handle,
-            user_cognito_id
+            'display_name':  user_display_name,
+            'email': user_email,
+            'handle': user_handle,
+            'cognito_user_id': user_cognito_id
         ]
         cur.execute(sql,*params)
         conn.commit() 

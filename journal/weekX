@@ -171,3 +171,70 @@ deleteObject
 
 
 grab the CrdSyncRole Arn and paste it to .github/workflows/sync.yaml
+
+
+## Reconnect Database and Post Confirmation Lambda
+
+./bin/backend/build
+
+./bin/backend/push
+./bin/backend/register
+
+goto ECS and update the version of your backend
+
+change the docker compose file to add on the backend
+
+
+```sh
+    build: 
+      context:  ./backend-flask
+      dockerfile: Dockerfile
+      
+```
+
+do docker compose up to see if backend container will be down.
+
+
+test the local db connection
+./bin/db/connect if we're able to connect (connection would be failed)
+
+
+if no error, we have to push it 
+
+./bin/backend/build
+
+./bin/backend/push
+
+
+goto api.cruddursn.net/api/activities/home - Internal Server Error
+
+
+connect to the prod db
+
+./bin/db/connect prod
+create schema-load
+CONNECTION_URL=$PROD_CONNECTION_URL ./bin/db/migrate to add bio column
+
+
+on the frontend cfn template add this at the end
+
+
+```sh
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+```
+
+and redeploy the frontend cfn
+
+```sh
+./bin/cfn/frontend
+```
+
+On lambda change the connexion URL to the PROD one
+We have to change in this case the value of the parameter CONNECTION_URL
+swith the Lambda VPC to the cfn vpc created
+
+create a new SG named CognitoLambdaSG
