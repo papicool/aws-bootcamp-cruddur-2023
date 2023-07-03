@@ -255,3 +255,15 @@ EnvBackendUrl = 'https://api.cruddursn.net'
 ```
 deploy the service
 ./bin/cfn/service
+
+## Week-X CICD Pipeline and Create Activity
+
+do 
+
+./bin/db/setup
+./bin/db/kill-all
+./bin/db/update_cognito_user_ids
+
+
+redeploy our cicd pipeline
+./bin/cfn/cicd
