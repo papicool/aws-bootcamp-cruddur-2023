@@ -7,6 +7,6 @@ stack_name = 'CrdCicd'
 ServiceStack = 'CrdSrvBackendFlask'
 ClusterStack = 'CrdCluster'
 GitHubBranch = 'prod'
-GithubRepo = 'aws-bootcamp-cruddur-2023'
+GithubRepo = 'papicool/aws-bootcamp-cruddur-2023'
 ArtifactBucketName = "codepipeline-cruddur-artifacts-cloudbootcamp"
 BuildSpec = 'backend-flask/buildspec.yml'
