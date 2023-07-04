@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 
 from lib.db import db
 from lib.ddb import Ddb
-#from lib.momento import MomentoCounter
 
 class CreateMessage:
   # mode indicates if we want to create a new message_group or using an existing one
@@ -27,7 +26,7 @@ class CreateMessage:
     if message == None or len(message) < 1:
       model['errors'] = ['message_blank'] 
     elif len(message) > 1024:
-      model['errors'] = ['message_exceed_max_chars'] 
+      model['errors'] = ['message_exceed_max_chars_1024'] 
 
     if model['errors']:
       # return what we provided
@@ -80,6 +79,5 @@ class CreateMessage:
           other_user_display_name=other_user['display_name'],
           other_user_handle=other_user['handle']
         )
-      #MomentoCounter.incr(f"msgs/{user_handle}")
       model['data'] = data
     return model
