@@ -19,6 +19,7 @@ if [ "$1" = "prod" ]; then
     source "$DB_PATH/schema-load" prod
     source "$DB_PATH/seed" prod
     python "$DB_PATH/update_cognito_user_ids" prod
+    python "$DB_PATH/migrate"
 else
     echo "Running in development mode"
     source "$DB_PATH/drop"
@@ -26,4 +27,5 @@ else
     source "$DB_PATH/schema-load"
     source "$DB_PATH/seed"
     python "$DB_PATH/update_cognito_user_ids"
+    python "$DB_PATH/migrate"
 fi
