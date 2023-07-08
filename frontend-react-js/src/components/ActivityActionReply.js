@@ -1,9 +1,10 @@
-import {ReactComponent as ReplyIcon} from './svg/reply.svg';
+import {ReactComponent as HeartIcon} from './svg/heart.svg';
 
-export default function ActivityActionReply(props) { 
+export default function ActivityActionLike(props) { 
   const onclick = (event) => {
-    props.setReplyActivity(props.activity)
-    props.setPopped(true)
+    event.preventDefault()
+    console.log('toggle like/unlike')
+    return false
   }
 
   let counter;
@@ -12,8 +13,8 @@ export default function ActivityActionReply(props) {
   }
 
   return (
-    <div onClick={onclick} className="action activity_action_reply">
-      <ReplyIcon className='icon' />
+    <div onClick={onclick} className="action activity_action_heart">
+      <HeartIcon className='icon' />
       {counter}
     </div>
   )
